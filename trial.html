@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Highlight features containing similar data</title>
+<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+<style>
+body { margin: 0; padding: 0; }
+#map { position: absolute; top: 0; bottom: 0; width: 100%; }
+</style>
+</head>
+<body>
+<style>
+    .map-overlay {
+        font:
+            12px/20px 'Helvetica Neue',
+            Arial,
+            Helvetica,
+            sans-serif;
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        border-radius: 3px;
+        position: absolute;
+        width: 25%;
+        top: 10px;
+        left: 10px;
+        padding: 10px;
+        display: none;
+    }
+</style>
+
+<div id="map"></div>
+<div id="map-overlay" class="map-overlay"></div>
+
+<script>
+
+    mapboxgl.accessToken = 'pk.eyJ1Ijoibm9ydG9uMjciLCJhIjoiY2xoam9hNHI5MGpuMjNscWtlcTF2dTN3dyJ9.xx0qCx-woV7mYFkrMNQmiA';
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/norton27/clt6q7cpd00g601o8dhbr3nvw', //insert style here, here are some pre-set options https://docs.mapbox.com/api/maps/styles/
+            center: [-123.16761577284362, 49.68914344599266], //insert coordinates here
+            zoom: 9,
+            pitch: 60,
+            bearing: 30
+        });
+
+
+    const overlay = document.getElementById('map-overlay');
+
+    // Create a popup, but don't add it to the map yet.
+    const popup = new mapboxgl.Popup({
+        closeButton: false
+    });
+
+    // Because features come from tiled vector data,
+    // feature geometries may be split
+    // or duplicated across tile boundaries.
+    // As a result, features may appear
+    // multiple times in query results.
+    function getUniqueFeatures(features, comparatorProperty) {
+        const uniqueIds = new Set();
+        const uniqueFeatures = [];
+        for (const feature of features) {
+            const id = feature.properties[comparatorProperty];
+            if (!uniqueIds.has(id)) {
+                uniqueIds.add(id);
+                uniqueFeatures.push(feature);
+            }
+        }
+        return uniqueFeatures;
+    }
+
+    map.on('load', () => {
+        // Add a custom vector tileset source. The tileset used i
+
+        map.addSource('plants_data', {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/cnorton27/Exploratory-Lab-1/main/withID.geojson' // Replace with the URL of your GeoJSON data
+            });
+
+            map.addLayer({
+                id: 'highlighted-plants2',
+                type: 'circle',
+                source: 'plants_data',
+                paint: {
+                    'circle-color': '#cefad0',
+                    'circle-radius': 5,
+                    'circle-stroke-width': .3,
+                    'circle-stroke-color': '#fff',
+                    'circle-opacity': 1
+                },
+                //'filter' : ['==', ['get', 'feature_collection_name'], current_species]
+                'filter': ['in', 'feature_collection_name', '']
+            });
+
+
+            map.addLayer({
+                id: 'squam-plants',
+                type: 'circle',
+                source: 'plants_data',
+                paint: {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 6,
+                    'circle-opacity': 0.4
+                }
+            },
+            );
+
+            map.addLayer({
+                id: 'highlighted-plants',
+                type: 'circle',
+                source: 'plants_data',
+                paint: {
+                    'circle-color': '#cefad0',
+                    'circle-radius': 5,
+                    'circle-stroke-width': .3,
+                    'circle-stroke-color': '#fff',
+                    'circle-opacity': 1
+                },
+                'filter': ['in', 'feature_collection_name', '']
+            });
+
+
+              ////////////////search similar features through mouse-over/////////////////////////////////////////////////////////////////////////
+        // not functional, needs debugging
+
+        const overlay = document.getElementById('map-overlay');
+
+        // Create a popup, but don't add it to the map yet.
+        const popup3 = new mapboxgl.Popup({
+            closeButton: false
+        });
+
+        // function makes sure feature is not a duplicate caused by loading multiple map tiles at once
+        function getUniqueFeatures(features, comparatorProperty) {
+            const uniqueIds = new Set();
+            const uniqueFeatures = [];
+            for (const feature2 of features) {
+                const id = feature2.properties[comparatorProperty];
+                if (!uniqueIds.has(id)) {
+                    uniqueIds.add(id);
+                    uniqueFeatures.push(feature2);
+                }
+            }
+            return uniqueFeatures;
+
+        }
+
+
+        map.on('mousemove', 'squam-plants', (e) => {
+
+            // feature2 = plant that mouse is hovering over
+            const feature2 = e.features[0];
+
+            const current_species = feature2.properties.feature_collection_name
+
+            const relatedplants = map.querySourceFeatures('highlighted-plants2', {  //'squam-plants'
+                sourceLayer: 'original',
+                filter: ['in', 'feature_collection_name', current_species]
+            });
+
+            const uniqueplants = getUniqueFeatures(relatedplants, 'ID');
+
+
+            const title = document.createElement('strong');
+            title.textContent =
+                feature2.properties.feature_collection_name +
+                ' (' +
+                uniqueplants.length +
+                ' found)';
+
+            const ID = document.createElement('div');
+            ID.textContent =
+                'Total plants:'
+
+            overlay.innerHTML = '';
+            overlay.style.display = 'block';
+
+            overlay.appendChild(title);
+            overlay.appendChild(population);
+
+
+            map.setFilter('highlighted-plants2', [
+                'in',
+                'feature_collection_name',
+                feature.properties.feature_collection_name
+            ]);
+
+
+            // Display a popup
+            popup3
+                .setLngLat(e.lngLat)
+                .setText(feature2.properties.feature_collection_name)
+                .addTo(map);
+        });
+
+
+
+        map.on('mouseleave', 'squam-plants', () => {
+            map.getCanvas().style.cursor = '';
+            popup3.remove();
+            map.setFilter('highlighted-plants2', ['in', 'feature_collection_name', '']);
+            overlay.style.display = 'none';
+        });})
+
+</script>
+
+</body>
+</html>
