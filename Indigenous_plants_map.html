@@ -211,7 +211,7 @@
 
             map.addSource('parks_boundary', {
                 type: 'geojson',
-                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addLayer({
@@ -259,6 +259,21 @@
             );
             /// this is the squamish territory layer 
 
+            map.addLayer({
+                id: 'parks-boundary',
+                type: 'circle',
+                source: 'parks_boundary',
+                layout: {
+                    'visibility': 'visible'
+                },
+                paint: {
+                    'circle-color': '#11b4da',
+                    'circle-radius': 6,
+                    'circle-opacity': 0.75
+                }
+            },
+            );
+            /// this is the BC Parks boundary layer 
 
             canvas.addEventListener('mousedown', mouseDown, true);
 
