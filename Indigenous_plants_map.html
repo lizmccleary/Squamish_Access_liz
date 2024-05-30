@@ -206,7 +206,12 @@
 
             map.addSource('squamish_boundary', {
                 type: 'geojson',
-                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/updated_plants.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
+            });
+
+            map.addSource('parks_boundary', {
+                type: 'geojson',
+                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addLayer({
@@ -239,13 +244,16 @@
             /// this is a blank layer to queery data
 
             map.addLayer({
-                id: 'squam-plants',
+                id: 'squam-boundary',
                 type: 'circle',
-                source: 'plants_data',
+                source: 'squamish_boundary',
+                layout: {
+                    'visibility': 'visible'
+                },
                 paint: {
                     'circle-color': '#11b4da',
                     'circle-radius': 6,
-                    'circle-opacity': 0
+                    'circle-opacity': 1
                 }
             },
             );
