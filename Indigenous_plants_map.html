@@ -201,17 +201,17 @@
 
             map.addSource('plants_data', {
                 type: 'geojson',
-                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/updated_plants.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addSource('squamish_boundary', {
                 type: 'geojson',
-                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addSource('parks_boundary', {
                 type: 'geojson',
-                data: 'https://github.com/lizmccleary/Squamish_Access_liz/blob/main/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addLayer({
@@ -260,7 +260,7 @@
             /// this is the squamish territory layer 
 
             map.addLayer({
-                id: 'parks-boundary',
+                id: 'park-boundary',
                 type: 'circle',
                 source: 'parks_boundary',
                 layout: {
@@ -386,11 +386,68 @@
                     .addTo(map);
             });
 
+        // After the last frame rendered before the map enters an "idle" state.
+        map.on('idle', () => {
+        // If these two layers were not added to the map, abort
+        if (!map.getLayer('squam-plants') || !map.getLayer('squam-boundary') || !map.getLayer('park-boundary')) {
+            return;
+        }
+
+        // Enumerate ids of the layers.
+        const toggleableLayerIds = ['squam-plants', 'squam-boundary', 'park-boundary'];
+
+        // Set up the corresponding toggle button for each layer.
+        for (const id of toggleableLayerIds) {
+            // Skip layers that already have a button set up.
+            if (document.getElementById(id)) {
+                continue;
+            }
+
+            // Create a link.
+            const link = document.createElement('a');
+            link.id = id;
+            link.href = '#';
+            link.textContent = id;
+            link.className = 'active';
+
+            // Show or hide layer when the toggle is clicked.
+            link.onclick = function (e) {
+                const clickedLayer = this.textContent;
+                e.preventDefault();
+                e.stopPropagation();
+
+                const visibility = map.getLayoutProperty(
+                    clickedLayer,
+                    'visibility'
+                );
+
+                // Toggle layer visibility by changing the layout object's visibility property.
+                if (visibility === 'visible') {
+                    map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                    this.className = '';
+                } else {
+                    this.className = 'active';
+                    map.setLayoutProperty(
+                        clickedLayer,
+                        'visibility',
+                        'visible'
+                    );
+                }
+            };
+
+            const layers = document.getElementById('menu');
+            layers.appendChild(link);
+        }
+    });
+
 
         });
 
 
         ////////////////search similar features through mouse-over/////////////////////////////////////////////////////////////////////////
+        ///////////////////this is the only pop-up that works///////////////
+        ////////FIGURE OUT HOW TO ADD COMMON + SQUAMISH NAMES AND SEARCH FOR SPECIES//////////
+    
 
         map.on('load', () => {
             const overlay = document.getElementById('map-overlay');
@@ -420,6 +477,7 @@
                 // feature = plant that mouse is hovering over
                 const feature = e.features[0];
 
+                ////ADD COMMON_NAME AND SQUAMISH_NAME TO THIS CHUNK??//
                 const current_species = feature.properties.feature_collection_name
 
                 const relatedplants = map.querySourceFeatures('highlighted-plants', {  //'squam-plants'
@@ -463,44 +521,6 @@
 
 
     </script>
-        <div class="container">
-            <h1>Community Species Observation Survey</h1>
-            <button id="toggle-form-button"><i class="fas fa-edit"></i> Fill Out the Survey Form</button>
-            <div class="form-container" id="form-container"></div>
-                <form id="survey-form">
-                <div class="form-group">
-                    <label for="description">Description:</label>
-                    <p>Describe the plant observed/harvested, how it will be used, condition it was found in, relative abundance, how much was harvested, etc.</p>
-                    <textarea id="description" name="description" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="observation-time">Time of Observation:</label>
-                    <p>Please record the time of your observation.</p>
-                    <input type="datetime-local" id="observation-time" name="observation-time" required>
-                </div>
-                <div class="form-group">
-                    <label for="observation-location">Location of Observation:</label>
-                    <p>Drag and drop the blue marker to the harvesting location.</p>
-                    <div id="map"></div>
-                    <input type="text" id="location-coordinates" name="location-coordinates" readonly required>
-                </div>
-                <div class="form-group">
-                    <label for="notes">Notes:</label>
-                    <p>Add information about the harvesting site ex: shady slope as well as seasonal conditions, plant health and notes for fellow community memebers.</p>
-                    <textarea id="notes" name="notes" rows="4"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="picture">Upload Picture:</label>
-                    <p>Upload a picture of the species in this observation.</p>
-        <input type="file" id="picture" name="picture" accept="image/*">
-                </div>
-                <button type="submit"><i class="fas fa-paper-plane"></i> Submit</button>
-            </form>
-            <div class="form-footer">
-                <p>Thank you for adding to the growing collection of culturally important species library. Your observation can be viewed on the interactive Squamish Plants map.</p>
-            </div>
-        </div>
-        
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
         <script>
             // Replace with your Mapbox access token
