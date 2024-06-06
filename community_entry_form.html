@@ -6,6 +6,7 @@
     <title>Community Species Observation Survey</title>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.css" rel="stylesheet" />
     <style>
         :root {
             --primary-color: #2E8B57;
@@ -144,13 +145,13 @@
         </div>
         <div class="form-group">
             <label for="observation-location">Location of Observation:</label>
-            <p>Drag and drop the blue marker to the harvesting location.</p>
+            <p>Drop a pin or draw a polygon around the harvesting location.</p>
             <div id="map"></div>
             <input type="text" id="location-coordinates" name="location-coordinates" readonly required>
         </div>
         <div class="form-group">
             <label for="notes">Notes:</label>
-            <p>Add information about the harvesting site ex: shady slope as well as seasonal conditions, plant health and notes for fellow community members.</p>
+            <p>Add information about the harvesting site as well as seasonal conditions and notes for fellow community members.</p>
             <textarea id="notes" name="notes" rows="4"></textarea>
         </div>
         <div class="form-group">
@@ -171,32 +172,53 @@
 </div>
 
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.js"></script>
+  
+  
 <script>
     // Replace with your Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1IjoibGl6bWNjbGVhcnkiLCJhIjoiY2x3amt0dHVkMG4wZzJrbDh6bTF5djV2cyJ9.TeDF2xIPvCR4wmiTdEju8w';
 
     var map = new mapboxgl.Map({
         container: 'map',
-        style: 'mapbox://styles/lizmccleary/clwqx2xyq015f01qea456a8ck',
+        style: 'mapbox://styles/lizmccleary/clx3odt4e07mr01ql2avqboc6',
         center: [-122.9495, 49.957], // Coordinates for Garibaldi Provincial Park, BC
         zoom: 9 // Adjusted zoom level for better visibility
     });
 
-    var marker = new mapboxgl.Marker({
-        draggable: true
-    })
-    .setLngLat([-122.9495, 49.957])
-    .addTo(map);
+     var draw = new MapboxDraw({
+        displayControlsDefault: false,
+        controls: {
+            point: true,
+            polygon: true,
+            trash: true
+        }
+    });
+  
+     // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+  
+    map.addControl(draw);
 
-    function onDragEnd() {
-        var lngLat = marker.getLngLat();
-        document.getElementById('location-coordinates').value = lngLat.lng + ',' + lngLat.lat;
+    map.on('draw.create', updateCoordinates);
+    map.on('draw.update', updateCoordinates);
+    map.on('draw.delete', clearCoordinates);
+
+    function updateCoordinates(e) {
+        var data = draw.getAll();
+        if (data.features.length > 0) {
+            var feature = data.features[0];
+            document.getElementById('location-coordinates').value = JSON.stringify(feature.geometry.coordinates);
+        }
     }
 
-    marker.on('dragend', onDragEnd);
+    function clearCoordinates() {
+        document.getElementById('location-coordinates').value = '';
+    }
 
-    // Ensure the location coordinates are set initially
-    document.getElementById('location-coordinates').value = marker.getLngLat().lng + ',' + marker.getLngLat().lat;
+    document.getElementById('picture-box').addEventListener('click', function() {
+        document.getElementById('picture').click();
+    }); 
 </script>
 
 </body>
