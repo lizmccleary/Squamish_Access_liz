@@ -104,7 +104,7 @@
   
      <style>
        #menu {
-        background: #fff;
+        background: #888888;
         position: absolute;
         z-index: 1;
         top: 10px;
@@ -117,7 +117,7 @@
 
     #menu a {
         font-size: 13px;
-        color: #404040;
+        color: #888888;
         display: block;
         margin: 0;
         padding: 0;
@@ -132,21 +132,39 @@
     }
 
     #menu a:hover {
-        background-color: #f8f8f8;
-        color: #404040;
+        background-color: #888888;
+        color: #888888;
     }
 
     #menu a.active {
-        background-color: #3887be;
+        background-color: #888888;
         color: #ffffff;
     }
 
     #menu a.active:hover {
-        background: #3074a4;
+        background: #404040;
     }
+
+    #survey-button {
+        background: #888888;
+        color: white;
+        display: block;
+        padding: 10px 15px; 
+        border: none; 
+        border-radius: 5px; 
+        font-size: 16px;
+        font-family: 'Helvetica Heue', Helvetica sans-serif;
+        position: absolute; 
+        bottom: 65px; 
+        left: 10px; 
+        cursor: pointer; 
+        z-index: 1;
+    }
+    
   </style> 
   
     <nav id="menu"></nav>
+    <button id="survey-button" onclick="window.open('https://lizmccleary.github.io/form-website/community_entry_form.html', '_blank')">Community Observation Form</button>
     <div id="map"></div>
   
     <div id="popup_title" class="popup_title">
@@ -197,7 +215,7 @@
             });
             // add the DEM source as a terrain layer with exaggerated height
             map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 });
-        });
+        }); 
       
      ////// Bounding Box Query /////////////
      map.boxZoom.disable(); 
@@ -217,6 +235,25 @@
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson' // Replace with the URL of your GeoJSON data
             });
+      
+      // Define pastel colors
+        const pastelColors = [
+'#FF8BAO', '#FFC2A6', '#D3E5CF', '#CEF4F8', '#FDF0D7',
+            '#C2E9BF', '#F9E795', '#FFE5EC', '#CE9DD9', '#87AFD4'];
+
+        // Function to generate a random pastel color
+        function getRandomPastelColor() {
+            return pastelColors[Math.floor(Math.random() * pastelColors.length)];
+        }
+
+        // Function to assign colors to species
+        function assignColorsToSpecies(species) {
+            const speciesColors = {};
+            species.forEach((sp, index) => {
+                speciesColors[sp] = pastelColors[index % pastelColors.length];
+            });
+            return speciesColors;
+        }
 
  ///as of JUNE 6th, this layer doesnt show up on map 
             map.addLayer({
@@ -235,20 +272,41 @@
       //// this is a layer to use later in "Total plants" pop-up 
       
       
-              map.addLayer({
-                id: 'squam-plants',
-                type: 'circle',
-                source: 'plants_data',
-                layout: {
-                  'visibility': 'visible'
-                }, 
-                paint: {
-                    'circle-color': '#11b4da',
-                    'circle-radius': 6,
-                    'circle-opacity':1
-                }
-            },
-            );
+              // Get unique species
+            const uniqueSpecies = new Set();
+            fetch('https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    data.features.forEach(feature => {
+                        uniqueSpecies.add(feature.properties.feature_collection_name);
+                    });
+
+                    const speciesColors = assignColorsToSpecies([...uniqueSpecies]);
+
+                    // Add layer with pastel colors for each species
+                    map.addLayer({
+                        id: 'squam-plants',
+                        type: 'circle',
+                        source: 'plants_data',
+                        layout: {
+                            'visibility': 'visible'
+                        },
+                        paint: {
+                            'circle-color': [
+                                'match',
+                                ['get', 'feature_collection_name'],
+                                ...Object.entries(speciesColors).flat(),
+                                '#11b4da' // default color
+                            ],
+                            'circle-radius': 6,
+                            'circle-opacity': 0.75, 
+                            'circle-stroke-color': '#808080',
+                            'circle-stroke-width': 0.5, 
+                            'circle-blur': 0.2
+                        }
+                    });
+                });
+
             /// this layer is involved in queerying data 
       
       
@@ -288,8 +346,8 @@
                     'visibility': 'visible'
                 },
                 paint: {
-                    'fill-color': '#90EE90',
-                    'fill-outline-color': '#90EE90',
+                    'fill-color': '#367c2b',
+                    'fill-outline-color': '#367c2b',
                     'fill-opacity': 0.75
                 }
             },
