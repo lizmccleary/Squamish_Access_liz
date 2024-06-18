@@ -13,6 +13,7 @@
     <!-- Turf and jQuery code. -->
     <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script> 
+  <script src="https://unpkg.com/togeojson"></script>
 
 
     <style>
@@ -111,7 +112,7 @@
         left: 10px;
         border-radius: 3px;
         width: 120px;
-        border: 1px solid rgba(0, 0, 0, 0.4);
+        border: 1px solid #808080;
         font-family: 'Helvetica Heue', Helvetica/ sans-serif;
     }
 
@@ -123,7 +124,7 @@
         padding: 0;
         padding: 10px;
         text-decoration: none;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+        border-bottom: 1px solid #696969;
         text-align: center;
     }
 
@@ -132,7 +133,7 @@
     }
 
     #menu a:hover {
-        background-color: #888888;
+        background-color: #f8f8f8;
         color: #888888;
     }
 
@@ -159,7 +160,24 @@
         left: 10px; 
         cursor: pointer; 
         z-index: 1;
-    }
+       }
+       
+       #survey-button a {
+         color: #888888
+       }
+       
+      #survey-button a:hover {
+        background-color: #888888; 
+        color: #ffffff; 
+      }
+       
+       #survey-button a.active {
+         background-color: #888888; 
+       }
+       
+       #survey-button a.active:hover {
+         background: #404040; 
+       }
     
   </style> 
   
@@ -229,8 +247,29 @@
 
             let start;
             let current;
-            let box;
-
+            let box; 
+      
+            map.addSource('tenure-source', {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/Crown_Tenures.geojson' // Replace with the URL of your GeoJSON data
+            });
+      
+                  map.addLayer({
+                id: 'private-land',
+                type: 'fill',
+                source: 'tenure-source',
+                layout: {
+                    'visibility': 'visible'
+                },
+                paint: {
+                    'fill-color': '#708090',
+                    'fill-outline-color': '#708090',
+                    'fill-opacity': 0.60
+                }
+            },
+            );
+            /// this is the squamish territory layer 
+      
             map.addSource('plants_data', {
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson' // Replace with the URL of your GeoJSON data
@@ -352,19 +391,17 @@
                 }
             },
             );
-            /// this is the BC Parks boundary layer 
-    });
 
-      
+    }); 
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
         // If these three layers were not added to the map, abort
-        if (!map.getLayer('squam-plants') || !map.getLayer('squam-boundary') || !map.getLayer('park-boundary')) {
+        if (!map.getLayer('squam-plants') || !map.getLayer('squam-boundary') || !map.getLayer('private-land') || !map.getLayer('park-boundary')) {
             return;
         }
 
         // Enumerate ids of the layers.
-        const toggleableLayerIds = ['squam-plants', 'squam-boundary', 'park-boundary'];
+        const toggleableLayerIds = ['squam-plants', 'squam-boundary', 'private-land', 'park-boundary'];
 
         // Set up the corresponding toggle button for each layer.
         for (const id of toggleableLayerIds) {
@@ -410,6 +447,27 @@
         }
     });
 
+/////// Add a popup on click for private land layer 
+            map.on('click', 'private-land', (e) => {
+                const coordinates = e.lngLat;
+                const properties = e.features[0].properties;
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(`<strong>Tenure Stage:</strong> ${properties.TENURE_STAGE}<br><strong>Tenure Purpose:</strong> ${properties.TENURE_PURPOSE}<br><strong>Tenure Subpurpose:</strong> ${properties.TENURE_SUBPURPOSE}<br><strong>Tenure Location:</strong> ${properties.TENURE_LOCATION}`)
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when the mouse is over the private_land layer
+            map.on('mouseenter', 'private_land', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves
+            map.on('mouseleave', 'private_land', () => {
+                map.getCanvas().style.cursor = '';
+            });
+      
 ///////////////////// Create a bounding box ////////////////////////
             canvas.addEventListener('mousedown', mouseDown, true);
 
@@ -594,7 +652,7 @@
                 overlay.style.display = 'none';
             });
         });
-
+      
 
     </script>
         
