@@ -105,7 +105,7 @@
   
      <style>
        #menu {
-        background: #888888;
+        background: #f8f8f8;
         position: absolute;
         z-index: 1;
         top: 10px;
@@ -143,7 +143,7 @@
     }
 
     #menu a.active:hover {
-        background: #404040;
+        background: #888888;
     }
 
     #survey-button {
@@ -187,7 +187,7 @@
   
     <div id="popup_title" class="popup_title">
         <span class="close" onclick="togglePopup()">&times;</span>
-        <img id="popup_titleImg" src="webmap-accessintro.png" alt='Intro Slide'> 
+        <img id="popup_titleImg" src="accessintro.png" alt='Intro Slide'> 
     </div>
 
     <div id="map-overlay" class="map-overlay"></div>
@@ -257,10 +257,7 @@
                   map.addLayer({
                 id: 'private-land',
                 type: 'fill',
-                source: 'tenure-source',
-                layout: {
-                    'visibility': 'visible'
-                },
+                source: 'tenure-source', 
                 paint: {
                     'fill-color': '#708090',
                     'fill-outline-color': '#708090',
@@ -294,19 +291,22 @@
             return speciesColors;
         }
 
- ///as of JUNE 6th, this layer doesnt show up on map 
+ ///as of JUNE 18th, this layer doesnt show up on map 
             map.addLayer({
                 id: 'highlighted-plants',
                 type: 'circle',
                 source: 'plants_data', 
+                layout: {
+                  'visibility': 'visible'
+                }, 
                 paint: {
                     'circle-color': '#AFFF00',
                     'circle-radius': 5,
                     'circle-stroke-width': .3,
                     'circle-stroke-color': '#fff',
-                    'circle-opacity': 1
+                    'circle-opacity': 0.75
                 },
-                 'filter': ['in', 'feature_collection_name', '']
+                 'filter': ['in', 'Common_Name', '']
             });
       //// this is a layer to use later in "Total plants" pop-up 
       
@@ -391,6 +391,24 @@
                 }
             },
             );
+      
+      map.addSource('closure-data', {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/bcgov/api-specs/master/open511/open511_OAS3.json' // Replace with the URL of your GeoJSON data
+            });
+      
+      map.addLayer({
+                id: 'Gov-closure',
+                type: 'symbol',
+                source: 'closure-data',
+                layout: {
+                    'visibility': 'visible', 
+                    'icon-image': 'marker-15', 
+                    'icon-size': 1.5
+                }
+            },
+            );
+      
 
     }); 
 // After the last frame rendered before the map enters an "idle" state.
@@ -611,18 +629,18 @@
                 // feature = plant that mouse is hovering over
                 const feature = e.features[0];
 
-                const current_species = feature.properties.feature_collection_name
+                const current_species = feature.properties.Common_Name
 
                 const relatedplants = map.querySourceFeatures('highlighted-plants', {  //'squam-plants'
                     sourceLayer: 'original',
-                    filter: ['in', 'feature_collection_name', current_species]
+                    filter: ['in', 'Common_Name', current_species]
                 });
 
                 const uniqueplants = getUniqueFeatures(relatedplants, 'ID');
 
                 const title = document.createElement('strong');
                 title.textContent =    
-                  feature.properties.feature_collection_name  
+                  feature.properties.Common_Name  
   
 
                 const ID = document.createElement('div');
@@ -639,8 +657,8 @@
 
                 map.setFilter('highlighted-plants', [
                     'in',
-                    'feature_collection_name',
-               feature.properties.feature_collection_name
+                    'Common_Name',
+               feature.properties.Common_Name
                 ]);
 
             });
@@ -648,7 +666,7 @@
             map.on('mouseleave', 'squam-plants', () => {
                 map.getCanvas().style.cursor = '';
                 popup3.remove();
-                map.setFilter('highlighted-plants', ['in', 'feature_collection_name']);
+                map.setFilter('highlighted-plants', ['in', 'Common_Name']);
                 overlay.style.display = 'none';
             });
         });
