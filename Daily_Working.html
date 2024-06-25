@@ -392,6 +392,7 @@
             },
             );
       
+//// As of June 25, this layer doesn't work or show up on map ////
       map.addSource('closure-data', {
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/bcgov/api-specs/master/open511/open511_OAS3.json' // Replace with the URL of your GeoJSON data
@@ -605,94 +606,6 @@
                 });
 
             });
-
-            //popup ... might delete or change info to a picture of the plants from iNaturalist later
-            map.on('click', 'squam-plants', (e) => {
-                const coordinates = e.features[0].geometry.coordinates.slice();
-                const description = e.features[0].properties.feature_collection_name;
-
-                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                }
-
-                new mapboxgl.Popup()
-                    .setLngLat(coordinates)
-                    .setText(description)
-                    .addTo(map);
-            });
-
-
-        ////////////////search similar features through mouse-over/////////////////////////////////////////////////////////////////////////
-
-        map.on('load', () => {
-            const overlay = document.getElementById('map-overlay');
-
-            // Create a popup, but don't add it to the map yet.
-            const popup3 = new mapboxgl.Popup({
-                closeButton: false
-            });
-
-            // function makes sure feature is not a duplicate caused by loading multiple map tiles at once
-            function getUniqueFeatures(features, comparatorProperty) {
-                const uniqueIds = new Set();
-                const uniqueFeatures = [];
-                for (const feature of features) {
-                    const id = feature.properties[comparatorProperty];
-                    if (!uniqueIds.has(id)) {
-                        uniqueIds.add(id);
-                        uniqueFeatures.push(feature);
-                    }
-                }
-                return uniqueFeatures;
-
-            }
-
-            map.on('mousemove', 'squam-plants', (e) => {
-
-                // feature = plant that mouse is hovering over
-                const feature = e.features[0];
-
-                const current_species = feature.properties.Common_Name
-
-                const relatedplants = map.querySourceFeatures('highlighted-plants', {  //'squam-plants'
-                    sourceLayer: 'original',
-                    filter: ['in', 'Common_Name', current_species]
-                });
-
-                const uniqueplants = getUniqueFeatures(relatedplants, 'ID');
-
-                const title = document.createElement('strong');
-                title.textContent =    
-                  feature.properties.Common_Name  
-  
-
-                const ID = document.createElement('div');
-                ID.textContent =
-                    'Total plants:' + " " +
-                    feature.properties.species_count
-
-                overlay.innerHTML = '';
-                overlay.style.display = 'block';
-
-                overlay.appendChild(title);
-                overlay.appendChild(ID);
-
-
-                map.setFilter('highlighted-plants', [
-                    'in',
-                    'Common_Name',
-               feature.properties.Common_Name
-                ]);
-
-            });
-
-            map.on('mouseleave', 'squam-plants', () => {
-                map.getCanvas().style.cursor = '';
-                popup3.remove();
-                map.setFilter('highlighted-plants', ['in', 'Common_Name']);
-                overlay.style.display = 'none';
-            });
-        });
       
 
     </script>
