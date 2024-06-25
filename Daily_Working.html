@@ -187,7 +187,7 @@
   
     <div id="popup_title" class="popup_title">
         <span class="close" onclick="togglePopup()">&times;</span>
-        <img id="popup_titleImg" src="accessintro.png" alt='Intro Slide'> 
+        <img id="popup_titleImg" src="UpdatedIntro.png" alt='Intro Slide'> 
     </div>
 
     <div id="map-overlay" class="map-overlay"></div>
@@ -324,7 +324,7 @@
 
                     // Add layer with pastel colors for each species
                     map.addLayer({
-                        id: 'squam-plants',
+                        id: 'squamish-plants',
                         type: 'circle',
                         source: 'plants_data',
                         layout: {
@@ -350,15 +350,15 @@
       
       
             
-            map.addSource('squamish_boundary', {
+            map.addSource('squam_boundary', {
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addLayer({
-                id: 'squam-boundary',
+                id: 'squamish-boundary',
                 type: 'fill',
-                source: 'squamish_boundary',
+                source: 'squam_boundary',
                 layout: {
                     'visibility': 'visible'
                 },
@@ -415,12 +415,12 @@
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
         // If these three layers were not added to the map, abort
-        if (!map.getLayer('squam-plants') || !map.getLayer('squam-boundary') || !map.getLayer('private-land') || !map.getLayer('park-boundary')) {
+        if (!map.getLayer('squamish-plants') || !map.getLayer('squamish-boundary') || !map.getLayer('private-land') || !map.getLayer('park-boundary')) {
             return;
         }
 
         // Enumerate ids of the layers.
-        const toggleableLayerIds = ['squam-plants', 'squam-boundary', 'private-land', 'park-boundary'];
+        const toggleableLayerIds = ['squamish-plants', 'squamish-boundary', 'private-land', 'park-boundary'];
 
         // Set up the corresponding toggle button for each layer.
         for (const id of toggleableLayerIds) {
@@ -468,7 +468,7 @@
 
             
 ///// Create popup for squam-plants /////////////////
-            map.on('click', 'squam-plants', (e) => {
+            map.on('click', 'squamish-plants', (e) => {
                 const coordinates = e.lngLat;
                 const properties = e.features[0].properties;
 
@@ -479,12 +479,12 @@
             });
 
             // Change the cursor to a pointer when the mouse is over the private_land layer
-            map.on('mouseenter', 'squam-plants', () => {
+            map.on('mouseenter', 'squamish-plants', () => {
                 map.getCanvas().style.cursor = 'pointer';
             });
 
             // Change it back to a pointer when it leaves
-            map.on('mouseleave', 'squam-plants', () => {
+            map.on('mouseleave', 'squamish-plants', () => {
                 map.getCanvas().style.cursor = '';
             });
       
@@ -584,7 +584,7 @@
 
                 if (bbox) {
                     const features = map.queryRenderedFeatures(bbox, {
-                        layers: ['squam-plants']
+                        layers: ['squamish-plants']
                     });
 
                     if (features.length >= 10000) {
