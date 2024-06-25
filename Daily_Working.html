@@ -465,6 +465,29 @@
         }
     });
 
+            
+///// Create popup for squam-plants /////////////////
+            map.on('click', 'squam-plants', (e) => {
+                const coordinates = e.lngLat;
+                const properties = e.features[0].properties;
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(`<strong>Common Name:</strong> ${properties.Common_Name}<br><strong>Traditional Name:</strong> ${properties.squamish_name}`)
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when the mouse is over the private_land layer
+            map.on('mouseenter', 'squam-plants', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves
+            map.on('mouseleave', 'squam-plants', () => {
+                map.getCanvas().style.cursor = '';
+            });
+      
+      
 /////// Add a popup on click for private land layer 
             map.on('click', 'private-land', (e) => {
                 const coordinates = e.lngLat;
@@ -486,7 +509,7 @@
                 map.getCanvas().style.cursor = '';
             });
       
-///////////////////// Create a bounding box ////////////////////////
+/////////// Create a bounding box//////////////////
             canvas.addEventListener('mousedown', mouseDown, true);
 
             // Return the xy coordinates of the mouse position
