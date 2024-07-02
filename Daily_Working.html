@@ -126,6 +126,7 @@
         text-decoration: none;
         border-bottom: 1px solid #696969;
         text-align: center;
+        background-color: #ffffff; 
     }
 
     #menu a:last-child {
@@ -187,7 +188,7 @@
   
     <div id="popup_title" class="popup_title">
         <span class="close" onclick="togglePopup()">&times;</span>
-        <img id="popup_titleImg" src="UpdatedIntro.png" alt='Intro Slide'> 
+        <img id="popup_titleImg" src="accessintro.png" alt='Intro Slide'> 
     </div>
 
     <div id="map-overlay" class="map-overlay"></div>
@@ -258,6 +259,7 @@
                 id: 'private-land',
                 type: 'fill',
                 source: 'tenure-source', 
+                layout: {'visibility': 'none'}, 
                 paint: {
                     'fill-color': '#708090',
                     'fill-outline-color': '#708090',
@@ -348,9 +350,12 @@
 
             /// this layer is involved in queerying data 
       
-      
-            
-            map.addSource('squam_boundary', {
+//// Add Open 511 API to map as source and layer ////////////// 
+      //once given permission by GovBC, figure out way forward// 
+        
+   
+/////////// this is the squamish territory layer ////////////
+            map.addSource('squam-boundary', {
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
@@ -358,7 +363,7 @@
             map.addLayer({
                 id: 'squamish-boundary',
                 type: 'fill',
-                source: 'squam_boundary',
+                source: 'squam-boundary',
                 layout: {
                     'visibility': 'visible'
                 },
@@ -369,9 +374,8 @@
                 }
             },
             );
-            /// this is the squamish territory layer 
           
-      
+/////// this is the BC Parks layer /////////
             map.addSource('parks_boundary', {
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
@@ -382,7 +386,7 @@
                 type: 'fill',
                 source: 'parks_boundary',
                 layout: {
-                    'visibility': 'visible'
+                    'visibility': 'none'
                 },
                 paint: {
                     'fill-color': '#367c2b',
@@ -409,9 +413,9 @@
                 }
             },
             );
-      
-
     }); 
+      
+      
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
         // If these three layers were not added to the map, abort
@@ -435,6 +439,10 @@
             link.href = '#';
             link.textContent = id;
             link.className = 'active';
+          
+          // Set initial class based on layer visibility
+        const visibility = map.getLayoutProperty(id, 'visibility');
+        link.className = (visibility === 'visible') ? 'active' : '';
 
             // Show or hide layer when the toggle is clicked.
             link.onclick = function (e) {
@@ -447,7 +455,7 @@
                     'visibility'
                 );
 
-                // Toggle layer visibility by changing the layout object's visibility property.
+               // Toggle layer visibility by changing the layout object's visibility property.
                 if (visibility === 'visible') {
                     map.setLayoutProperty(clickedLayer, 'visibility', 'none');
                     this.className = '';
@@ -465,7 +473,6 @@
             layers.appendChild(link);
         }
     });
-
             
 ///// Create popup for squam-plants /////////////////
             map.on('click', 'squamish-plants', (e) => {
