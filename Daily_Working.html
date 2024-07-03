@@ -13,7 +13,7 @@
     <!-- Turf and jQuery code. -->
     <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script> 
-  <script src="https://unpkg.com/togeojson"></script>
+    <script src="https://unpkg.com/togeojson"></script>
 
 
     <style>
@@ -346,13 +346,42 @@
                         }
                     });
                 });
-
-            /// this layer is involved in queerying data 
       
-//// Add Open 511 API to map as source and layer ////////////// 
-      //once given permission by GovBC, figure out way forward// 
-        
-   
+//// As of June 25, this layer doesn't work or show up on map ////
+      map.addSource('closure-data', {
+                type: 'json',
+                data: 'https://raw.githubusercontent.com/bcgov/api-specs/master/open511/open511.json'
+            });
+      
+      map.addLayer({
+                id: 'Gov-closure',
+                type: 'symbol',
+                source: 'closure-data',
+                layout: {
+                    'visibility': 'visible', 
+                    'icon-image': 'marker-15', 
+                    'icon-size': 1.5
+                }
+            },
+            );
+      
+      const apiURL = 'https://api.open511.gov.bc.ca/events?status=ACTIVE'; 
+      
+      fetch(apiURL)
+        .then(response => {
+        if(!response.ok) {
+          throw new Error('Network response not ok'); 
+        }
+        return response.json();
+      })
+      .then(data => {
+        ///display data in HTML element such as the closures layer 
+        Gov-closure.textContent = JSON.stringify(data, null, 2); 
+      })
+      .catch(error => {
+        cosole.error('Error:', error); 
+      }); 
+      
 /////////// this is the squamish territory layer ////////////
             map.addSource('squam-boundary', {
                 type: 'geojson',
@@ -394,26 +423,7 @@
                 }
             },
             );
-      
-//// As of June 25, this layer doesn't work or show up on map ////
-      map.addSource('closure-data', {
-                type: 'geojson',
-                data: 'https://raw.githubusercontent.com/bcgov/api-specs/master/open511/open511_OAS3.json' // Replace with the URL of your GeoJSON data
-            });
-      
-      map.addLayer({
-                id: 'Gov-closure',
-                type: 'symbol',
-                source: 'closure-data',
-                layout: {
-                    'visibility': 'visible', 
-                    'icon-image': 'marker-15', 
-                    'icon-size': 1.5
-                }
-            },
-            );
-    }); 
-      
+    });   
       
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
