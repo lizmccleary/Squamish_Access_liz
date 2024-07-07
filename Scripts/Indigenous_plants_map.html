@@ -45,9 +45,7 @@
             bottom: 60%;
             left: 50%;
             width: 70%;
-            /* 1/3 of the viewport width */
             height: 70%;
-            /* 1/3 of the viewport height */
             transform: translate(-50%, -50%);
             padding: 20px;
             z-index: 1000;
@@ -55,11 +53,8 @@
 
         .popup_title img {
             width: 100%;
-            /* Ensure image fills the container width */
             height: auto;
-            /* Maintain aspect ratio */
             display: block;
-            /* Prevents extra space below image */
         }
 
         .popup_title .close {
@@ -261,9 +256,11 @@
             let current;
             let box; 
       
+      
+         /// this is a tenured land layer 
             map.addSource('tenure-source', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/Crown_Tenures.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/Crown_Tenures.geojson' // Replace with the URL of your GeoJSON data
             });
       
                   map.addLayer({
@@ -282,7 +279,7 @@
       
             map.addSource('plants_data', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/updated_plants.geojson' // Replace with the URL of your GeoJSON data
             });
       
       // Define pastel colors
@@ -321,12 +318,11 @@
                 },
                  'filter': ['in', 'Common_Name', '']
             });
-      //// this is a layer to use later in "Total plants" pop-up 
       
       
-              // Get unique species
+      //// this is the visible plants layer with unique colours
             const uniqueSpecies = new Set();
-            fetch('https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson')
+            fetch('https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/updated_plants.geojson')
                 .then(response => response.json())
                 .then(data => {
                     data.features.forEach(feature => {
@@ -356,19 +352,14 @@
                             'circle-stroke-width': 0.5, 
                             'circle-blur': 0.2
                         }
-                    });
+                    });              
                 });
-
-            /// this layer is involved in queerying data 
-      
-//// Add Open 511 API to map as source and layer ////////////// 
-      //once given permission by GovBC, figure out way forward// 
         
    
 /////////// this is the squamish territory layer ////////////
             map.addSource('squam-boundary', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/squamish_boundary.geojson' 
             });
 
             map.addLayer({
@@ -389,7 +380,7 @@
 /////// this is the BC Parks layer /////////
             map.addSource('parks_boundary', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/parks_boundary.geojson'
             });
 
             map.addLayer({
@@ -410,7 +401,7 @@
 //// As of June 25, this layer doesn't work or show up on map ////
       map.addSource('closure-data', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/bcgov/api-specs/master/open511/open511_OAS3.json' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/bcgov/api-specs/master/open511/open511_OAS3.json' 
             });
       
       map.addLayer({
@@ -428,7 +419,7 @@
       
       
 // After the last frame rendered before the map enters an "idle" state.
-    map.on('idle', () => {
+  map.on('idle', () => {
         // If these three layers were not added to the map, abort
         if (!map.getLayer('squamish-plants') || !map.getLayer('squamish-boundary') || !map.getLayer('private-land') || !map.getLayer('park-boundary')) {
             return;
@@ -484,7 +475,7 @@
             layers.appendChild(link);
         }
     });
-            
+    
 ///// Create popup for squam-plants /////////////////
             map.on('click', 'squamish-plants', (e) => {
                 const coordinates = e.lngLat;
