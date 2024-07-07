@@ -7,7 +7,7 @@
       "start": "node server_side.js"
     },
     "author": "Liz McCleary",
-    "license": "MIT",
+    "license": "",
     "dependencies": {
       "express": "^4.17.1"
     }
