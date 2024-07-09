@@ -69,6 +69,16 @@
             font-size: 20px;
             cursor: pointer;
         }
+    
+        .mapboxgl-ctrl-scale {
+            font-size: 15px; 
+            padding: 8px; 
+        }
+
+        .mapboxgl-ctrl-group button {
+            width: 42px; 
+            height: 42px; 
+        }
 
         .mapboxgl-popup {
             max-width: 400px;
@@ -153,11 +163,11 @@
         padding: 20px 15px; 
         border: none; 
         border-radius: 6px; 
-        font-size: 18px;
+        font-size: 25px;
         font-family: 'Helvetica Heue', Helvetica sans-serif;
         position: absolute; 
-        bottom: 65px; 
-        left: 10px; 
+        bottom: 30px; 
+        right: 8px; 
         cursor: pointer; 
         z-index: 1;
        }
@@ -181,6 +191,7 @@
     
   </style> 
   
+    <pre id="output.json"></pre>
     <nav id="menu"></nav>
     <button id="survey-button" onclick="window.open('https://lizmccleary.github.io/form-website/community_entry_form.html', '_blank')">Community Observation Form</button>
     <div id="map"></div>
@@ -191,6 +202,7 @@
     </div>
 
     <div id="map-overlay" class="map-overlay"></div>
+  
 
     <script>
 
@@ -204,9 +216,7 @@
             }
         }
 
-
-
-        ////// map /////////////////////////////////////////////////////////////
+////// map ////////////////////////////////////////////////////
        	mapboxgl.accessToken = 'pk.eyJ1IjoibGl6bWNjbGVhcnkiLCJhIjoiY2x3amt0dHVkMG4wZzJrbDh6bTF5djV2cyJ9.TeDF2xIPvCR4wmiTdEju8w';
     const map = new mapboxgl.Map({
         container: 'map',
@@ -251,7 +261,7 @@
       
             map.addSource('tenure-source', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/Crown_Tenures.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/Crown_Tenures.geojson' // Replace with the URL of your GeoJSON data
             });
       
                   map.addLayer({
@@ -266,11 +276,11 @@
                 }
             },
             );
-            /// this is the squamish territory layer 
-      
+
+        /// this is the squamish territory layer 
             map.addSource('plants_data', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/updated_plants.geojson' // Replace with the URL of your GeoJSON data
             });
       
       // Define pastel colors
@@ -314,7 +324,7 @@
       
               // Get unique species
             const uniqueSpecies = new Set();
-            fetch('https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/updated_plants.geojson')
+            fetch('https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/updated_plants.geojson')
                 .then(response => response.json())
                 .then(data => {
                     data.features.forEach(feature => {
@@ -347,45 +357,10 @@
                     });
                 });
       
-//// As of June 25, this layer doesn't work or show up on map ////
-      map.addSource('closure-data', {
-                type: 'json',
-                data: 'https://raw.githubusercontent.com/bcgov/api-specs/master/open511/open511.json'
-            });
-      
-      map.addLayer({
-                id: 'Gov-closure',
-                type: 'symbol',
-                source: 'closure-data',
-                layout: {
-                    'visibility': 'visible', 
-                    'icon-image': 'marker-15', 
-                    'icon-size': 1.5
-                }
-            },
-            );
-      
-      const apiURL = 'https://api.open511.gov.bc.ca/events?status=ACTIVE'; 
-      
-      fetch(apiURL)
-        .then(response => {
-        if(!response.ok) {
-          throw new Error('Network response not ok'); 
-        }
-        return response.json();
-      })
-      .then(data => {
-        ///display data in HTML element such as the closures layer 
-        Gov-closure.textContent = JSON.stringify(data, null, 2); 
-      })
-      .catch(error => {
-        cosole.error('Error:', error); 
-      }); 
-      
-/////////// this is the squamish territory layer ////////////
+/////////// This is the Squamish territory layer ////////////
             map.addSource('squam-boundary', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/squamish_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addLayer({
@@ -403,10 +378,10 @@
             },
             );
           
-/////// this is the BC Parks layer /////////
+/////// This is the BC Parks layer /////////
             map.addSource('parks_boundary', {
                 type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
             });
 
             map.addLayer({
@@ -423,6 +398,50 @@
                 }
             },
             );
+      
+      /// Run function that fetches Open511 geojson data and puts it into output.geojson //
+        const apiUrl = 'https://api.open511.gov.bc.ca/events?status=ACTIVE';
+
+        // Fetch data from the API
+        fetch(apiUrl)
+            .then(response => {
+                // Check if the response is successful
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // Parse the JSON data from the response
+                return response.json();
+            })
+            .then(data => {
+                // Display the JSON data
+           document.getElementById('output.json').textContent = JSON.stringify(data, null, 2);
+            })
+            .catch(error => {
+                // Handle any errors
+                console.error('There was a problem with the fetch operation:', error);
+            });
+      
+      /////// this is the Open511 API layer /////////
+            map.addSource('output', {
+                type: 'json',
+                data: 'output.json' // Replace with the URL of your GeoJSON data
+            });
+
+            map.addLayer({
+                id: 'output.json',
+                type: 'fill',
+                source: 'output.json',
+                layout: {
+                    'visibility': 'none'
+                },
+                paint: {
+                    'fill-color': '#367c2b',
+                    'fill-outline-color': '#367c2b',
+                    'fill-opacity': 0.75
+                }
+            },
+            );
+      
     });   
       
 // After the last frame rendered before the map enters an "idle" state.
@@ -625,6 +644,7 @@
       
 
     </script>
+ 
         
 </body>
 
