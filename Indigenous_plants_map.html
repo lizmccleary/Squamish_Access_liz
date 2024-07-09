@@ -74,16 +74,14 @@
                 sans-serif;
         }
       
-        /* Custom styles for the scale control */
         .mapboxgl-ctrl-scale {
-            font-size: 15px; /* Increase font size */
-            padding: 8px; /* Add padding */
+            font-size: 15px; 
+            padding: 8px; 
         }
 
-        /* Custom styles for the navigation control */
         .mapboxgl-ctrl-group button {
-            width: 42px; /* Increase width */
-            height: 42px; /* Increase height */
+            width: 42px; 
+            height: 42px; 
         }
 
         .map-overlay {
@@ -275,19 +273,17 @@
                 }
             },
             );
+
             /// this is the squamish territory layer 
-      
             map.addSource('plants_data', {
                 type: 'geojson',
                 data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/updated_plants.geojson' // Replace with the URL of your GeoJSON data
             });
-      
-      // Define pastel colors
+    
         const pastelColors = [
 '#FF8BAO', '#FFC2A6', '#D3E5CF', '#CEF4F8', '#FDF0D7',
             '#C2E9BF', '#F9E795', '#FFE5EC', '#CE9DD9', '#87AFD4'];
 
-        // Function to generate a random pastel color
         function getRandomPastelColor() {
             return pastelColors[Math.floor(Math.random() * pastelColors.length)];
         }
