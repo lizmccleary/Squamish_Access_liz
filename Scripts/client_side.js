@@ -9,7 +9,7 @@ document.getElementById('geometry-type').addEventListener('change', function() {
     }
 });
 
-document.getElementById('survey-form').addEventListener('submit', function(event) {
+document.getElementById('survey_form').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const geometryType = document.getElementById('geometry-type').value;
