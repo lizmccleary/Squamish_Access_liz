@@ -188,10 +188,36 @@
        #survey-button a.active:hover {
          background: #404040; 
        }
+       
+         #iframe-container {
+            position: absolute;
+            top: 10px; /* Adjust as needed */
+            left: 5px; /* Adjust as needed */
+            width: 98%; /* Adjust as needed */
+            height: 95%; /* Adjust as needed */
+            border: 1px solid #ccc; /* Optional */
+            z-index: 10; /* Ensure it appears above the map */
+            display: none; /* Initially hidden */
+        }
+
+        #toggle-button {
+            background: #888888; 
+            color: white; 
+            display: block; 
+            padding: 20px 15px; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: 20px;
+            font-family: 'Helvetica Heue', Helvetica sans-serif;
+            position: absolute;
+            bottom: 101px;
+            right: 15px;
+            z-index: 20; /* Ensure it appears above the iframe */
+            cursor: pointer;
+        }
     
-  </style> 
+  </style>
   
-    <pre id="output.json"></pre>
     <nav id="menu"></nav>
     <button id="survey-button" onclick="window.open('https://lizmccleary.github.io/form-website/community_entry_form.html', '_blank')">Community Observation Form</button>
     <div id="map"></div>
@@ -202,6 +228,11 @@
     </div>
 
     <div id="map-overlay" class="map-overlay"></div>
+  
+    <div id="iframe-container">
+    <iframe id="iframe" src="https://governmentofbc.maps.arcgis.com/apps/webappviewer/index.html?id=a42873895b3d4ca084ea9730212cacb1"         width="100%" height="100%"></iframe>
+  </div>
+  <div id="toggle-button">Closures Layer</div>
   
 
     <script>
@@ -399,50 +430,175 @@
             },
             );
       
-      /// Run function that fetches Open511 geojson data and puts it into output.geojson //
-        const apiUrl = 'https://api.open511.gov.bc.ca/events?status=ACTIVE';
-
-        // Fetch data from the API
-        fetch(apiUrl)
-            .then(response => {
-                // Check if the response is successful
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                // Parse the JSON data from the response
-                return response.json();
-            })
-            .then(data => {
-                // Display the JSON data
-           document.getElementById('output.json').textContent = JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                // Handle any errors
-                console.error('There was a problem with the fetch operation:', error);
-            });
       
-      /////// this is the Open511 API layer /////////
-            map.addSource('output', {
-                type: 'json',
-                data: 'output.json' // Replace with the URL of your GeoJSON data
-            });
+      /// Run function that fetches Open511 geojson data and puts it into output.geojson //
+          const Open511API = 'https://api.open511.gov.bc.ca/events?format=json&status=ACTIVE';
 
-            map.addLayer({
-                id: 'output.json',
-                type: 'fill',
-                source: 'output.json',
-                layout: {
-                    'visibility': 'none'
-                },
-                paint: {
-                    'fill-color': '#367c2b',
-                    'fill-outline-color': '#367c2b',
-                    'fill-opacity': 0.75
+    fetch(Open511API)
+        .then(response => response.json())
+        .then(data => {
+            data.events.forEach(event => {
+                if (event.geography) {
+                    const geometryType = event.geography.type;
+                    const coordinates = event.geography.coordinates;
+
+                    if (geometryType === 'LineString') {
+                        addLineLayer(event, coordinates);
+                    } else if (geometryType === 'Point') {
+                        addPointLayer(event, coordinates);
+                    }
+                }
+            });
+        })
+        .catch(error => console.error('Error fetching traffic data:', error));
+
+    // Function to add a line layer to the map
+    function addLineLayer(event, coordinates) {
+        const lineColor = getLineColor(event.severity);
+
+        map.addLayer({
+            'id': event.id,
+            'type': 'line',
+            'source': {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'LineString',
+                        'coordinates': coordinates
+                    },
+                    'properties': {
+                        'headline': event.headline,
+                        'description': event.description,
+                        'severity': event.severity,
+                        'created': event.created,
+                        'updated': event.updated,
+                        'schedule': formatSchedule(event.schedule)
+                    }
                 }
             },
-            );
+            'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+            },
+            'paint': {
+                'line-color': lineColor,
+                'line-width': 5
+            }
+        });
+
+        addLayerPopup(event.id);
+    }
+
+    // Function to add a point layer to the map
+    function addPointLayer(event, coordinates) {
+        map.addLayer({
+            'id': event.id,
+            'type': 'circle',
+            'source': {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'geometry': {
+                        'type': 'Point',
+                        'coordinates': coordinates
+                    },
+                    'properties': {
+                        'headline': event.headline,
+                        'description': event.description,
+                        'severity': event.severity,
+                        'created': event.created,
+                        'updated': event.updated,
+                        'schedule': formatSchedule(event.schedule)
+                    }
+                }
+            },
+            'paint': {
+                'circle-radius': 6,
+                'circle-color': getLineColor(event.severity)
+            }
+        });
+
+        addLayerPopup(event.id);
+    }
+
+    // Function to add popup to a layer
+    function addLayerPopup(layerId) {
+        map.on('click', layerId, (e) => {
+            const coordinates = e.lngLat;
+            const properties = e.features[0].properties;
+
+            const popup = new mapboxgl.Popup({
+                closeOnMove: true,
+                maxWidth: '300px',
+                anchor: 'bottom'
+            })
+                .setLngLat(coordinates)
+                .setHTML(`<h3>${properties.headline}</h3>
+                          <p><strong>Description:</strong> ${properties.description}</p>
+                          <p><strong>Severity:</strong> ${properties.severity}</p>
+                          <p><strong>Created:</strong> ${properties.created}</p>
+                          <p><strong>Updated:</strong> ${properties.updated}</p>
+                          <p><strong>Schedule:</strong> ${properties.schedule}</p>`)
+                .addTo(map);
+
+            // Adjust popup position if necessary
+            const popupContainer = popup.getElement();
+            const mapContainer = map.getCanvasContainer();
+            const mapRect = mapContainer.getBoundingClientRect();
+            const popupRect = popupContainer.getBoundingClientRect();
+
+            if (popupRect.top < mapRect.top) {
+                popup.setOffset([0, popupRect.height / 2]);
+            }
+        });
+
+        map.on('mouseenter', layerId, () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', layerId, () => {
+            map.getCanvas().style.cursor = '';
+        });
+    }
+
+    // Function to determine line color based on severity
+    function getLineColor(severity) {
+        if (severity === 'MINOR') {
+            return '#FF851B'; // Green for low congestion
+        } else if (severity === 'MAJOR') {
+            return '#FF4136'; // Red for major congestion
+        } else {
+            return '#FF851B'; // Orange for moderate congestion
+        }
+    }
+
+    // Function to format schedule information
+    function formatSchedule(schedule) {
+        if (!schedule || !schedule.recurring_schedules) return 'N/A';
+        return schedule.recurring_schedules.map(s => {
+            return `Days: ${s.days.join(', ')}<br>
+                    Start Date: ${s.start_date}<br>
+                    End Date: ${s.end_date}<br>
+                    Daily Start Time: ${s.daily_start_time}<br>
+                    Daily End Time: ${s.daily_end_time}`;
+        }).join('<br><br>');
+    }
+  
+   // Fetch traffic data when the map loads
+    map.on('load', fetchTrafficData);
       
     });   
+      
+      /// Add toggle to Closures iframe
+    document.getElementById('toggle-button').addEventListener('click', () => {
+        const iframeContainer = document.getElementById('iframe-container');
+        if (iframeContainer.style.display === 'none') {
+            iframeContainer.style.display = 'block';
+        } else {
+            iframeContainer.style.display = 'none';
+        }
+    });
       
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
