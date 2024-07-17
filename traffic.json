@@ -1,4 +1,4 @@
-{
+{ 
   "events": [
     {
       "jurisdiction_url": "https://api.open511.gov.bc.ca/jurisdiction",
@@ -29990,13 +29990,5 @@
         }
       ]
     }
-  ],
-  "pagination": {
-    "offset": "0"
-  },
-  "meta": {
-    "url": "/events",
-    "up_url": "",
-    "version": "v1"
-  }
+  ]
 }
