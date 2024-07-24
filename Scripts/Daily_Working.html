@@ -216,7 +216,7 @@
   </style>
   
     <nav id="menu"></nav>
-    <button id="survey-button" onclick="window.open('https://lizmccleary.github.io/form-website/community_entry_form.html', '_blank')">Community Observation Form</button>
+    <button id="survey-button" onclick="window.open('https://lizmccleary.github.io/form-website/community_entry_form.html', '_blank')">Community Harvest Form</button>
     <div id="map"></div>
 
     <div id="popup_title" class="popup_title">
@@ -228,7 +228,7 @@
   
     <button id="closures-button" onclick="window.open('https://governmentofbc.maps.arcgis.com/apps/webappviewer/index.html?id=a42873895b3d4ca084ea9730212cacb1', '_blank')">Forest Road Layer</button>
   
-  <div id="toggle-button">Forest Road Layer</div>
+  <div id="toggle-button">BCGov Forest Road Closures</div>
   
 
     <script>
@@ -289,7 +289,7 @@
             });
       
                   map.addLayer({
-                id: 'private-land',
+                id: 'Private-Land',
                 type: 'fill',
                 source: 'tenure-source', 
                 layout: {'visibility': 'none'}, 
@@ -359,7 +359,7 @@
 
                     // Add layer with pastel colors for each species
                     map.addLayer({
-                        id: 'squamish-plants',
+                        id: 'Sḵwx̱wú7mesh-Plants',
                         type: 'circle',
                         source: 'plants_data',
                         layout: {
@@ -388,7 +388,7 @@
             });
 
             map.addLayer({
-                id: 'squamish-boundary',
+                id: 'Sḵwx̱wú7mesh-Territory',
                 type: 'fill',
                 source: 'squam-boundary',
                 layout: {
@@ -409,7 +409,7 @@
             });
 
             map.addLayer({
-                id: 'park-boundary',
+                id: 'BC-Parks',
                 type: 'fill',
                 source: 'parks_boundary',
                 layout: {
@@ -476,7 +476,7 @@
             },
             'paint': {
                 'line-color': lineColor,
-                'line-width': 5
+                'line-width': 8
             }
         });
 
@@ -507,7 +507,7 @@
                 }
             },
             'paint': {
-                'circle-radius': 6,
+                'circle-radius': 8,
                 'circle-color': getLineColor(event.severity)
             }
         });
@@ -586,12 +586,12 @@
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
         // If these three layers were not added to the map, abort
-        if (!map.getLayer('squamish-plants') || !map.getLayer('squamish-boundary') || !map.getLayer('private-land') || !map.getLayer('park-boundary')) {
+        if (!map.getLayer('Sḵwx̱wú7mesh-Plants') || !map.getLayer('Sḵwx̱wú7mesh-Territory') || !map.getLayer('Private-Land') || !map.getLayer('BC-Parks')) {
             return;
         }
 
         // Enumerate ids of the layers.
-        const toggleableLayerIds = ['squamish-plants', 'squamish-boundary', 'private-land', 'park-boundary'];
+        const toggleableLayerIds = ['Sḵwx̱wú7mesh-Plants', 'Sḵwx̱wú7mesh-Territory', 'Private-Land', 'BC-Parks'];
 
         // Set up the corresponding toggle button for each layer.
         for (const id of toggleableLayerIds) {
@@ -642,29 +642,29 @@
     });
             
 /// Create popup for squam-plants ///
-            map.on('click', 'squamish-plants', (e) => {
+            map.on('click', 'Sḵwx̱wú7mesh-Plants', (e) => {
                 const coordinates = e.lngLat;
                 const properties = e.features[0].properties;
 
                 new mapboxgl.Popup()
                     .setLngLat(coordinates)
-                    .setHTML(`<strong>Common Name:</strong> ${properties.Common_Name}<br><strong>Traditional Name:</strong> ${properties.squamish_name}`)
+                    .setHTML(`<strong>Traditional Name:</strong> ${properties.squamish_name}<br><strong>Common Name:</strong> ${properties.Common_Name}`)
                     .addTo(map);
             });
 
             // Change the cursor to a pointer when the mouse is over the private_land layer
-            map.on('mouseenter', 'squamish-plants', () => {
+            map.on('mouseenter', 'Sḵwx̱wú7mesh-Plants', () => {
                 map.getCanvas().style.cursor = 'pointer';
             });
 
             // Change it back to a pointer when it leaves
-            map.on('mouseleave', 'squamish-plants', () => {
+            map.on('mouseleave', 'Sḵwx̱wú7mesh-Plants', () => {
                 map.getCanvas().style.cursor = '';
             });
       
       
 /// Add a popup for private land layer ////
-            map.on('click', 'private-land', (e) => {
+            map.on('click', 'Private-Land', (e) => {
                 const coordinates = e.lngLat;
                 const properties = e.features[0].properties;
 
@@ -675,12 +675,12 @@
             });
 
             // Change the cursor to a pointer when the mouse is over the private_land layer
-            map.on('mouseenter', 'private_land', () => {
+            map.on('mouseenter', 'Private_Land', () => {
                 map.getCanvas().style.cursor = 'pointer';
             });
 
             // Change it back to a pointer when it leaves
-            map.on('mouseleave', 'private_land', () => {
+            map.on('mouseleave', 'Private_Land', () => {
                 map.getCanvas().style.cursor = '';
             });
 
