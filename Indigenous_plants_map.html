@@ -582,6 +582,28 @@
     map.on('load', fetchTrafficData);
       
     });   
+
+    ///// This is the community response layer /////
+    map.addSource('community_response', {
+                type: 'geojson',
+                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
+            });
+
+            map.addLayer({
+                id: 'Community-Response',
+                type: 'fill',
+                source: 'community_response',
+                layout: {
+                    'visibility': 'none'
+                },
+                paint: {
+                    'fill-color': '#367c2b',
+                    'fill-outline-color': '#367c2b',
+                    'fill-opacity': 0.75
+                }
+            },
+            );
+      
       
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
