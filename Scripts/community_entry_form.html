@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -111,28 +112,36 @@
             margin-top: 20px;
             color: var(--secondary-color);
         }
-      .form-group input[type="file"] {
-    /* Hide the default file input button */
-    display: none;
-}
 
-.upload-box {
-    /* Style for the upload box */
-    border: 2px dashed #ced4da; /* Dashed border */
-    padding: 20px; /* Add padding for better appearance */
-    cursor: pointer; /* Show pointer cursor when hovering */
-    text-align: center; /* Center the text */
-}
+        .form-group input[type="file"] {
+            display: none;
+        }
 
-.upload-box:hover {
-    border-color: #007bff; /* Change border color on hover */
-}
+        .upload-box {
+            border: 2px dashed #ced4da;
+            padding: 20px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .upload-box:hover {
+            border-color: #007bff;
+        }
     </style>
 </head>
+
 <body>
 <div class="container">
     <h1>Community Harvest Survey</h1>
-    <form id="survey-form">
+    <form id="survey-form" action="/submit" method="POST" enctype="multipart/form-data">
+        
+        <!-- Name Field -->
+        <div class="form-group">
+            <label for="name">Your Name:</label>
+            <p>Please enter your name.</p>
+            <input type="text" id="name" name="name" required>
+        </div>
+
         <div class="form-group">
             <label for="description">Description:</label>
             <p>Describe the plant observed/harvested, how it will be used, condition it was found in, relative abundance, how much was harvested, etc.</p>
@@ -155,18 +164,17 @@
             <textarea id="notes" name="notes" rows="4"></textarea>
         </div>
         <div class="form-group">
-    <label for="picture">Upload Picture:</label>
-    <p>Upload a picture of the species in this observation.</p>
-    <div class="upload-box" id="picture-box">
-        <i class="fas fa-cloud-upload-alt"></i> <!-- Icon for upload -->
-        <span>Drag &amp; Drop or Click to Upload</span> <!-- Instruction text -->
-        <input type="file" id="picture" name="picture" accept="image/*">
-    </div>
-</div>
+            <label for="picture">Upload Picture:</label>
+            <p>Upload a picture of the species in this observation.</p>
+            <div class="upload-box" id="picture-box">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Drag &amp; Drop or Click to Upload</span>
+                <input type="file" id="picture" name="picture" accept="image/*">
+            </div>
+        </div>
         <button type="submit"><i class="fas fa-paper-plane"></i> Submit</button>
     </form>
     <div class="form-footer">
-      
         <p>Thank you for your submission! All harvest entries will be stored in the Squamish Nations database, accessible only by members and displayed on the interactive Squamish Plants map.</p>
     </div>
 </div>
@@ -174,7 +182,6 @@
 <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
 <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.2.0/mapbox-gl-draw.js"></script>
 
-  
 <script>
     // Replace with your Mapbox access token
     mapboxgl.accessToken = 'pk.eyJ1IjoibGl6bWNjbGVhcnkiLCJhIjoiY2x3amt0dHVkMG4wZzJrbDh6bTF5djV2cyJ9.TeDF2xIPvCR4wmiTdEju8w';
@@ -186,7 +193,7 @@
         zoom: 9 // Adjusted zoom level for better visibility
     });
 
-     var draw = new MapboxDraw({
+    var draw = new MapboxDraw({
         displayControlsDefault: false,
         controls: {
             point: true,
@@ -194,10 +201,9 @@
             trash: true
         }
     });
-  
-     // Add zoom and rotation controls to the map.
+
+    // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
-  
     map.addControl(draw);
 
     map.on('draw.create', updateCoordinates);
@@ -218,7 +224,7 @@
 
     document.getElementById('picture-box').addEventListener('click', function() {
         document.getElementById('picture').click();
-    }); 
+    });
 </script>
 
 </body>
