@@ -2,7 +2,7 @@ from flask import Flask, request, render_template
 import json
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='Scripts')
 
 # Ensure the GeoJSON file exists with the correct structure
 def initialize_geojson_file():
