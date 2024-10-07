@@ -216,7 +216,7 @@
   </style>
   
     <nav id="menu"></nav>
-    <button id="survey-button" onclick="window.open('https://lizmccleary.github.io/form-website/community_entry_form.html', '_blank')">Community Harvest Form</button>
+    <button id="survey-button" onclick="window.open('http://127.0.0.1:5000', '_blank')">Community Harvest Form</button>
     <div id="map"></div>
 
     <div id="popup_title" class="popup_title">
@@ -583,37 +583,49 @@
       
     });   
 
-    ///// This is the community response layer /////
-    map.addSource('community_response', {
-                type: 'geojson',
-                data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/EXT/parks_boundary.geojson' // Replace with the URL of your GeoJSON data
-            });
+// Add GeoJSON source
+map.addSource('community_response', {
+    type: 'geojson',
+    data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/Survey_data/responses.geojson' // Replace with your GeoJSON data URL
+});
 
-            map.addLayer({
-                id: 'Community-Response',
-                type: 'fill',
-                source: 'community_response',
-                layout: {
-                    'visibility': 'none'
-                },
-                paint: {
-                    'fill-color': '#367c2b',
-                    'fill-outline-color': '#367c2b',
-                    'fill-opacity': 0.75
-                }
-            },
-            );
-      
-      
+// Add layer for polygons (fill)
+map.addLayer({
+    id: 'Community-Response-Polygon',
+    type: 'fill',
+    source: 'community_response',
+    layout: {
+        'visibility': 'none' // Set visibility based on your needs
+    },
+    paint: {
+        'fill-color': '#367c2b',
+        'fill-outline-color': '#367c2b',
+        'fill-opacity': 0.75
+    }
+});
+
+// Add layer for points (circle)
+map.addLayer({
+    id: 'Community-Response-Point',
+    type: 'circle',
+    source: 'community_response',
+    paint: {
+        'circle-radius': 6,
+        'circle-color': '#ff0000', // Change to your desired point color
+        'circle-opacity': 0.75
+    }
+});
+
+
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
         // If these three layers were not added to the map, abort
-        if (!map.getLayer('Sḵwx̱wú7mesh-Plants') || !map.getLayer('Sḵwx̱wú7mesh-Territory') || !map.getLayer('Private-Land') || !map.getLayer('BC-Parks')) {
+        if (!map.getLayer('Sḵwx̱wú7mesh-Plants') || !map.getLayer('Sḵwx̱wú7mesh-Territory') || !map.getLayer('Private-Land') || !map.getLayer('BC-Parks') || !map.getLayer('Community-Response-Polygon') || !map.getLayer('Community-Response-Point')) {
             return;
         }
 
         // Enumerate ids of the layers.
-        const toggleableLayerIds = ['Sḵwx̱wú7mesh-Plants', 'Sḵwx̱wú7mesh-Territory', 'Private-Land', 'BC-Parks'];
+        const toggleableLayerIds = ['Sḵwx̱wú7mesh-Plants', 'Sḵwx̱wú7mesh-Territory', 'Private-Land', 'BC-Parks', 'Community-Response-Polygon', 'Community-Response-Point'];
 
         // Set up the corresponding toggle button for each layer.
         for (const id of toggleableLayerIds) {
@@ -703,6 +715,27 @@
 
             // Change it back to a pointer when it leaves
             map.on('mouseleave', 'Private_Land', () => {
+                map.getCanvas().style.cursor = '';
+            });
+
+/// Add a popup for community responses layer ////
+            map.on('click', 'Community-Responses', (e) => {
+                const coordinates = e.lngLat;
+                const properties = e.features[0].properties;
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(`<strong>Name:</strong> ${properties.name}<br><<strong>Time:</strong> ${properties.observation-time}<br>strong>Description:</strong> ${properties.description}<br><strong>Notes:</strong> ${properties.notes}`)
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when the mouse is over the private_land layer
+            map.on('mouseenter', 'Community-Responses', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves
+            map.on('mouseleave', 'Community-Responses', () => {
                 map.getCanvas().style.cursor = '';
             });
 

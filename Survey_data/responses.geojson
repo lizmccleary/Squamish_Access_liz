@@ -36,6 +36,54 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "liz ",
+        "description": "salmonberries",
+        "observation_time": "2024-10-07T15:19",
+        "notes": "test"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.99929029519406,
+          49.91116664605863
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "liz",
+        "description": "salmonberries",
+        "observation_time": "2024-10-07T15:20",
+        "notes": "test "
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.97833911132766,
+          49.91495906413667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "liz",
+        "description": "salmonberries",
+        "observation_time": "2024-10-07T15:20",
+        "notes": "test "
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.97833911132766,
+          49.91495906413667
+        ]
+      }
     }
   ]
 }

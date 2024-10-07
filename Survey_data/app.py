@@ -20,6 +20,7 @@ def submit():
     description = request.form.get('description')
     observation_time = request.form.get('observation-time')
     location_coordinates = request.form.get('location-coordinates')
+    geometry_type = request.form.get('geometry-type')  # New field for geometry type
     notes = request.form.get('notes')
     picture = request.files.get('picture')
 
@@ -32,24 +33,33 @@ def submit():
         try:
             geojson_data = json.load(f)
         except json.JSONDecodeError:
-            # If the file is empty or invalid, reinitialize it
             initialize_geojson_file()
             with open('responses.geojson', 'r') as f:
                 geojson_data = json.load(f)
 
-    # Create a new GeoJSON feature
+    # Create a new GeoJSON feature based on the geometry type
+    if geometry_type == 'Point':
+        geometry = {
+            "type": "Point",
+            "coordinates": json.loads(location_coordinates)  # Ensure it's in [longitude, latitude]
+        }
+    elif geometry_type == 'Polygon':
+        geometry = {
+            "type": "Polygon",
+            "coordinates": [json.loads(location_coordinates)]  # Ensure it's a valid polygon structure
+        }
+    else:
+        return "Invalid geometry type!", 400  # Handle invalid geometry type
+
     feature = {
         "type": "Feature",
         "properties": {
-            "name": name, 
+            "name": name,
             "description": description,
             "observation_time": observation_time,
             "notes": notes
         },
-        "geometry": {
-            "type": "Point",
-            "coordinates": json.loads(location_coordinates)  # Ensure it's in [longitude, latitude]
-        }
+        "geometry": geometry
     }
 
     # Add the new feature to the GeoJSON data
