@@ -4,34 +4,36 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Liz",
-        "description": "blueberries",
-        "observation_time": "2024-10-06T16:51",
+        "name": "test",
+        "description": "salmonberries ",
+        "observation_time": "2024-10-09T12:16",
         "notes": "test"
       },
       "geometry": {
-        "type": "Point",
+        "type": "Polygon",
         "coordinates": [
           [
             [
-              -122.98932543945264,
-              49.92203290446034
-            ],
-            [
-              -122.91928759765574,
-              49.90169281619902
-            ],
-            [
-              -122.9398869628902,
-              49.89373131596389
-            ],
-            [
-              -122.98108569335872,
-              49.89726992269212
-            ],
-            [
-              -122.98932543945264,
-              49.92203290446034
+              [
+                -122.98598283613015,
+                49.93047663796935
+              ],
+              [
+                -122.94054150185974,
+                49.91933198052709
+              ],
+              [
+                -122.95677054981348,
+                49.900519528237254
+              ],
+              [
+                -122.9881467091905,
+                49.90261016308193
+              ],
+              [
+                -122.98598283613015,
+                49.93047663796935
+              ]
             ]
           ]
         ]
@@ -40,48 +42,16 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "liz ",
-        "description": "salmonberries",
-        "observation_time": "2024-10-07T15:19",
+        "name": "test",
+        "description": "cattail",
+        "observation_time": "2024-10-09T12:18",
         "notes": "test"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -122.99929029519406,
-          49.91116664605863
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "liz",
-        "description": "salmonberries",
-        "observation_time": "2024-10-07T15:20",
-        "notes": "test "
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -122.97833911132766,
-          49.91495906413667
-        ]
-      }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "name": "liz",
-        "description": "salmonberries",
-        "observation_time": "2024-10-07T15:20",
-        "notes": "test "
-      },
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -122.97833911132766,
-          49.91495906413667
+          -122.99116270781015,
+          49.918207132603555
         ]
       }
     }
