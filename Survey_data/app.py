@@ -43,11 +43,7 @@ def submit():
             "type": "Point",
             "coordinates": json.loads(location_coordinates)  # Ensure it's in [longitude, latitude]
         }
-    elif geometry_type == 'Polygon':
-        geometry = {
-            "type": "Polygon",
-            "coordinates": [json.loads(location_coordinates)]  # Ensure it's a valid polygon structure
-        }
+        
     else:
         return "Invalid geometry type!", 400  # Handle invalid geometry type
 
