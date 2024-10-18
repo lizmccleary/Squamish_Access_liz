@@ -94,6 +94,22 @@
           ]
         ]
       }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "test",
+        "description": "test",
+        "observation_time": "2024-10-09T09:50",
+        "notes": "test"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.87630171712266,
+          50.000285752311896
+        ]
+      }
     }
   ]
 }
