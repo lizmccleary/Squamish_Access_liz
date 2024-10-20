@@ -197,9 +197,9 @@
     var draw = new MapboxDraw({
         displayControlsDefault: false,
         controls: {
-            point: true,
-            polygon: false,
-            trash: true
+            point: true,         // Enable point drawing tool
+            polygon: true,       // Enable polygon drawing tool
+            trash: true          // Enable the delete tool
         }
     });
 
@@ -207,6 +207,7 @@
     map.addControl(new mapboxgl.NavigationControl());
     map.addControl(draw);
 
+    // Event handlers for when drawing is created, updated, or deleted
     map.on('draw.create', updateCoordinates);
     map.on('draw.update', updateCoordinates);
     map.on('draw.delete', clearCoordinates);
@@ -214,9 +215,19 @@
     function updateCoordinates(e) {
         var data = draw.getAll();
         if (data.features.length > 0) {
-            var feature = data.features[0];
-            document.getElementById('location-coordinates').value = JSON.stringify(feature.geometry.coordinates);
-            document.getElementById('geometry-type').value = feature.geometry.type; 
+            // For each feature, extract the geometry
+            var coordinatesArray = data.features.map(feature => {
+                // Check if the feature is a polygon or a point
+                if (feature.geometry.type === 'Polygon') {
+                    return feature.geometry.coordinates[0]; // Get the outer ring of the polygon
+                } else if (feature.geometry.type === 'Point') {
+                    return feature.geometry.coordinates;
+                }
+            });
+
+            // Set the location-coordinates and geometry-type inputs
+            document.getElementById('location-coordinates').value = JSON.stringify(coordinatesArray);
+            document.getElementById('geometry-type').value = data.features[0].geometry.type; 
         }
     }
 
@@ -228,6 +239,8 @@
     document.getElementById('picture-box').addEventListener('click', function() {
         document.getElementById('picture').click();
     });
+
+    
 </script>
 
 </body>

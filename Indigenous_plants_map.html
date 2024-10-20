@@ -582,50 +582,70 @@
     map.on('load', fetchTrafficData);
       
     });   
+/// Fetch responses from responses.geojson and update automatically every time a new submission is made
+function updateGeoJsonLayer() {
+    fetch('http://127.0.0.1:5000/responses.geojson') // Fetch from the correct file 'responses.geojson'
+        .then(response => response.json())
+        .then(data => {
+            if (map.getSource('responses-data')) {
+                map.getSource('responses-data').setData(data); // Update the existing source with new data
+            } else {
+                map.addSource('responses-data', {
+                    type: 'geojson',
+                    data: data
+                });
 
-// Add GeoJSON source
-map.addSource('community_response', {
-    type: 'geojson',
-    data: 'https://raw.githubusercontent.com/lizmccleary/Squamish_Access_liz/main/Survey_data/responses.geojson' // Replace with your GeoJSON data URL
+                // Add a layer for point features
+                map.addLayer({
+                    id: 'responses-point',
+                    type: 'circle',
+                    source: 'responses-data',
+                    filter: ['==', '$type', 'Point'], // Filter to show only point features
+                    paint: {
+                        'circle-radius': 5,
+                        'circle-color': '#FF0000'
+                    }
+                });
+
+                // Add a layer for polygon features
+                map.addLayer({
+                    id: 'responses-polygon',
+                    type: 'fill',
+                    source: 'responses-data',
+                    filter: ['==', '$type', 'Polygon'], // Filter to show only polygon features
+                    paint: {
+                        'fill-color': '#0080FF',
+                        'fill-opacity': 0.5
+                    }
+                });
+            }
+        })
+        .catch(error => console.error('Error updating GeoJSON data:', error));
+}
+
+// Event listener for the Community Harvest Form button
+document.getElementById('survey-button').addEventListener('click', function() {
+    // Open the community harvest form in a new tab
+    window.open('http://127.0.0.1:5000', '_blank');
+
+    // Optionally, set a delay to allow time for form submission processing before updating the map
+    setTimeout(updateGeoJsonLayer, 5000); // Adjust the delay as needed
 });
 
-// Add layer for polygons (fill)
-map.addLayer({
-    id: 'Community-Response-Polygon',
-    type: 'fill',
-    source: 'community_response',
-    layout: {
-        'visibility': 'none' // Set visibility based on your needs
-    },
-    paint: {
-        'fill-color': '#367c2b',
-        'fill-outline-color': '#367c2b',
-        'fill-opacity': 0.75
-    }
-});
+// Poll the GeoJSON file every 30 seconds to update the map layer with new submissions
+setInterval(updateGeoJsonLayer, 30000); // 30000 milliseconds = 30 seconds
 
-// Add layer for points (circle)
-map.addLayer({
-    id: 'Community-Response-Point',
-    type: 'circle',
-    source: 'community_response',
-    paint: {
-        'circle-radius': 6,
-        'circle-color': '#ff0000', // Change to your desired point color
-        'circle-opacity': 0.75
-    }
-});
 
 
 // After the last frame rendered before the map enters an "idle" state.
     map.on('idle', () => {
         // If these three layers were not added to the map, abort
-        if (!map.getLayer('Sḵwx̱wú7mesh-Plants') || !map.getLayer('Sḵwx̱wú7mesh-Territory') || !map.getLayer('Private-Land') || !map.getLayer('BC-Parks') || !map.getLayer('Community-Response-Polygon') || !map.getLayer('Community-Response-Point')) {
+        if (!map.getLayer('Sḵwx̱wú7mesh-Plants') || !map.getLayer('Sḵwx̱wú7mesh-Territory') || !map.getLayer('Private-Land') || !map.getLayer('BC-Parks')) {
             return;
         }
 
         // Enumerate ids of the layers.
-        const toggleableLayerIds = ['Sḵwx̱wú7mesh-Plants', 'Sḵwx̱wú7mesh-Territory', 'Private-Land', 'BC-Parks', 'Community-Response-Polygon', 'Community-Response-Point'];
+        const toggleableLayerIds = ['Sḵwx̱wú7mesh-Plants', 'Sḵwx̱wú7mesh-Territory', 'Private-Land', 'BC-Parks'];
 
         // Set up the corresponding toggle button for each layer.
         for (const id of toggleableLayerIds) {
@@ -718,27 +738,49 @@ map.addLayer({
                 map.getCanvas().style.cursor = '';
             });
 
-/// Add a popup for community responses layer ////
-            map.on('click', 'Community-Responses', (e) => {
+/// Add a popup for community responses point layer ////
+            map.on('click', 'responses-point', (e) => {
                 const coordinates = e.lngLat;
                 const properties = e.features[0].properties;
 
                 new mapboxgl.Popup()
                     .setLngLat(coordinates)
-                    .setHTML(`<strong>Name:</strong> ${properties.name}<br><<strong>Time:</strong> ${properties.observation-time}<br>strong>Description:</strong> ${properties.description}<br><strong>Notes:</strong> ${properties.notes}`)
+                    .setHTML(`<strong>Name:</strong> ${properties.name}<br><<strong>Time:</strong> ${properties['observation-time']}<br>strong>Description:</strong> ${properties.description}<br><strong>Notes:</strong> ${properties.notes}`)
                     .addTo(map);
             });
 
-            // Change the cursor to a pointer when the mouse is over the private_land layer
-            map.on('mouseenter', 'Community-Responses', () => {
+            // Change the cursor to a pointer when the mouse is over the responses-point layer
+            map.on('mouseenter', 'responses-point', () => {
                 map.getCanvas().style.cursor = 'pointer';
             });
 
             // Change it back to a pointer when it leaves
-            map.on('mouseleave', 'Community-Responses', () => {
+            map.on('mouseleave', 'responses-point', () => {
                 map.getCanvas().style.cursor = '';
             });
+      
 
+      /// Add a popup for community responses polygon layer ////
+            map.on('click', 'responses-polygon', (e) => {
+                const coordinates = e.lngLat;
+                const properties = e.features[0].properties;
+
+                new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(`<strong>Name:</strong> ${properties.name}<br><<strong>Time:</strong> ${properties['observation-time']}<br>strong>Description:</strong> ${properties.description}<br><strong>Notes:</strong> ${properties.notes}`)
+                    .addTo(map);
+            });
+
+            // Change the cursor to a pointer when the mouse is over the responses-polygon layer
+            map.on('mouseenter', 'responses-polygon', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            // Change it back to a pointer when it leaves
+            map.on('mouseleave', 'responses-polygon', () => {
+                map.getCanvas().style.cursor = '';
+            });
+      
     </script>
         
 </body>
