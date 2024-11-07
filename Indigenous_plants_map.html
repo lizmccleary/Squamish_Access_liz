@@ -107,7 +107,7 @@
        #menu {
         position: absolute;
         z-index: 1;
-        top: 10px;
+        top: 68px;
         left: 10px;
         border: none; 
         border-radius: 6px;
@@ -116,7 +116,7 @@
     }
 
     #menu a {
-        font-size: 18px;
+        font-size: 15px;
         color: #888888;
         display: block;
         margin: 0;
@@ -145,9 +145,113 @@
     #menu a.active:hover {
         background: #888888;
     }
+    #menu-info {
+        background: black;
+        color: white;
+        display: block;
+        width: 116px; 
+        padding: 10px 8px; 
+        border: 1px solid black;  
+        border-radius: 6px; 
+        border-color: black; 
+        font-size: 15px;
+        font-family: 'Helvetica Heue', Helvetica sans-serif;
+        font-weight: bold; 
+        position: absolute; 
+        top: 10px; 
+        left: 8px; 
+        cursor: pointer; 
+        z-index: 1;
+    }
+       
+    #menu-info a {
+         color: #8F9779
+    }
+       
+    #menu-info a:hover {
+        background-color: #8F9779; 
+        color: #ffffff;
+    }
+       
+    #menu-info a.active {
+         background-color: #8F9779; 
+    }
+       
+    #menu-info a.active:hover {
+         background: #404040; 
+    } 
+    #info-button {
+        background: black;
+        color: white;
+        display: block;
+        width: 140px; 
+        padding: 10px 6px; 
+        border: 1px solid black; 
+        border-radius: 6px; 
+        font-size: 15px;
+        font-family: 'Helvetica Heue', Helvetica sans-serif;
+        font-weight: bold; 
+        position: absolute; 
+        bottom: 222px; 
+        right: 9px; 
+        cursor: pointer; 
+        z-index: 1;
+    }
+       
+    #info-button a {
+         color: #8F9779
+    }
+       
+    #info-button a:hover {
+        background-color: #ffffff; 
+        color: #ffffff;
+    }
+       
+    #info-button a.active {
+         background-color: #ffffff; 
+    }
+       
+    #info-button a.active:hover {
+         background: #ffffff; 
+    }
+       
+    #harvest-button {
+        background: black;
+        color: white;
+        display: block;
+        width: 165px; 
+        padding: 10px 15px; 
+        border: 1px solid black; 
+        border-radius: 6px; 
+        font-size: 15px;
+        font-family: 'Helvetica Heue', Helvetica sans-serif;
+        font-weight: bold; 
+        position: absolute; 
+        bottom: 96px; 
+        right: 9px; 
+        cursor: pointer; 
+        z-index: 1;
+    }
+       
+    #harvest-button a {
+         color: #8F9779
+    }
+       
+    #harvest-button a:hover {
+        background-color: #ffffff; 
+        color: #ffffff;
+    }
+       
+    #harvest-button a.active {
+         background-color: #ffffff; 
+    }
+       
+    #harvest-button a.active:hover {
+         background: #ffffff; 
+    }
 
     #survey-button {
-        background: #888888;
+        background: #8F9779;
         color: white;
         display: block;
         padding: 20px 15px; 
@@ -156,23 +260,23 @@
         font-size: 25px;
         font-family: 'Helvetica Heue', Helvetica sans-serif;
         position: absolute; 
-        bottom: 30px; 
+        bottom: 24px; 
         right: 8px; 
         cursor: pointer; 
         z-index: 1;
        }
        
        #survey-button a {
-         color: #888888
+         color: #8F9779
        }
        
       #survey-button a:hover {
-        background-color: #888888; 
+        background-color: #8F9779; 
         color: #ffffff; 
       }
        
        #survey-button a.active {
-         background-color: #888888; 
+         background-color: #8F9779; 
        }
        
        #survey-button a.active:hover {
@@ -181,17 +285,17 @@
 
 
        #closures-button {
-        background: #888888;
+        background: #8F9779;
         color: white;
         display: block;
-        padding: 20px 15px; 
+        padding: 20px 8px;
         border: none; 
         border-radius: 6px; 
         font-size: 23px;
         font-family: 'Helvetica Heue', Helvetica sans-serif;
         position: absolute; 
-        bottom: 100px; 
-        right: 8px; 
+        bottom: 152px; 
+        right: 6px; 
         cursor: pointer; 
         z-index: 1;
        }
@@ -221,15 +325,17 @@
 
     <div id="popup_title" class="popup_title">
         <span class="close" onclick="togglePopup()">&times;</span>
-        <img id="popup_titleImg" src="popup-oct21.png" alt="Popup Image"> 
+        <img id="popup_titleImg" src="popup-july18.png" alt="Popup Image"> 
     </div>
 
     <div id="map-overlay" class="map-overlay"></div>
   
-    <button id="closures-button" onclick="window.open('https://governmentofbc.maps.arcgis.com/apps/webappviewer/index.html?id=a42873895b3d4ca084ea9730212cacb1', '_blank')">Forest Road Layer</button>
+    <button id="closures-button" onclick="window.open('https://governmentofbc.maps.arcgis.com/apps/webappviewer/index.html?id=a42873895b3d4ca084ea9730212cacb1', '_blank')">Forest Road Access</button>
   
-  <div id="toggle-button">BCGov Forest Road Closures</div>
-  
+  <div id="info-button">Click below for road closures (GovBC)</div>
+  <div id="harvest-button">Click below to access the community harvest form</div>
+  <div id="menu-info">Toggle layers on and off below</div>
+
 
     <script>
 
