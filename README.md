@@ -1,1 +1,8 @@
-...
+This folder was created based off requests from the Squamish Nation for an access map which would visualize barriers to culturally important plant species within the territory. 
+In this folder there is the Indigenous_plants_map.html which is the main map and can be hosted on any server. Within the Indigenous_plants_map, there are multiple buttons that activate the community_entry_form.html as well as the layers found in the EXT folder. 
+In order for responses to save properly, both the Indigenous_plants_map.html and the community_entry_form.html must be hosted on the same server and some of the script in app.py and community_entry_form.html may have to be altered. 
+The Survey_data folder houses all scripts related to the community_entry_form so that responses are automatically saved in the responses.geosjon file. The responses.geojson file can then be dislayed as a layer in the Indigenous_plants_map if correctly called from the html. 
+The Alpine_Fieldwork_Ethnobotany_Season_Summary1.docx and SN_Culturally_Significant_Vegetation-ERoss-1.pdf contain additional information about culturally important plant species for the Squamish Nation. 
+Any questions about this project can be directed to elizabethmccleary11@gmail.com or nboulangerlapointe@uvic.ca 
+We would love to collaborate further to tailor this map to continually fit the needs of the Squamish Nation. 
+We transfer complete ownership to the Nation in persuit of data sovereignty and cultural safety. 
