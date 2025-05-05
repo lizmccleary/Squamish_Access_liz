@@ -81,4 +81,4 @@ if __name__ == '__main__':
     # Initialize the GeoJSON file if it doesn't exist
     if not os.path.exists('responses.geojson'):
         initialize_geojson_file()
-    app.run(debug=True)
+    app.run(debug=False)
